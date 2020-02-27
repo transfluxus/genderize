@@ -48,6 +48,7 @@ class Genderize(object):
 
         self.session = requests.Session()
         self.session.headers = {'User-Agent': user_agent}
+        self.last_x_rate_headers = {}
 
     @staticmethod
     def _fixtypes(data):
@@ -138,6 +139,7 @@ class Genderize(object):
                 response.headers)
 
         decoded = response.json()
+        self.retrieve_x_rate_headers(response)
         if response.ok:
             # API returns a single object for a single name
             # but a list for multiple names.
@@ -162,6 +164,8 @@ class Genderize(object):
                 "get1() doesn't support the retheader option.")
         return self.get([name], **kwargs)[0]
 
+    def retrieve_x_rate_headers(self, response):
+        self.last_x_rate_headers = dict(filter(lambda header : header[0].startswith("X-Rate"), dict(response.headers).items()))
 
 def _chunked(iterable, n):
     """
